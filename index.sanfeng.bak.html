@@ -1,0 +1,635 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>三疯投研 OPC — 具身智能 · 机器人 · 物理AI</title>
+<style>
+  @view-transition { navigation: auto; }
+
+  :root {
+    --bg: #08080e;
+    --bg-alt: #0c0c16;
+    --bg-card: #10101e;
+    --bg-elevated: #16162a;
+    --border: rgba(255,255,255,0.06);
+    --border-hover: rgba(123,196,232,0.2);
+    --text: #eeeff5;
+    --text-soft: #b8b9cc;
+    --text-muted: #707090;
+    --text-dim: #484860;
+    --accent: #7bc4e8;
+    --accent-glow: rgba(123,196,232,0.07);
+    --accent-bright: #9fd8f2;
+    --amber: #f0b340;
+    --fire: #ff4060;
+    --radius: 8px;
+    --radius-l: 14px;
+    --radius-xl: 20px;
+    --font: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+    --mono: 'JetBrains Mono', 'SF Mono', 'Fira Code', monospace;
+    --w: 1120px;
+    --ease: cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    font-family: var(--font); color: var(--text); background: var(--bg);
+    line-height: 1.6; -webkit-font-smoothing: antialiased;
+    overflow-x: hidden;
+  }
+  ::selection { background: var(--accent); color: var(--bg); }
+
+  body::after {
+    content: ''; position: fixed; inset: 0; pointer-events: none; z-index: 9999;
+    opacity: 0.015;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+    background-repeat: repeat; background-size: 256px 256px;
+  }
+
+  nav {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+    background: rgba(8,8,14,0.72); backdrop-filter: blur(24px) saturate(1.4);
+    border-bottom: 1px solid var(--border); transition: border-color .4s;
+  }
+  nav .i {
+    max-width: var(--w); margin: 0 auto; padding: 0 28px;
+    height: 64px; display: flex; align-items: center; justify-content: space-between;
+  }
+  nav .logo {
+    font-weight: 650; font-size: 1.05rem; letter-spacing: 0.04em;
+    background: linear-gradient(135deg, var(--text) 40%, var(--text-soft));
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  }
+  nav .logo em { font-style: normal; -webkit-text-fill-color: var(--accent); }
+  nav .lk { display: flex; gap: 4px; align-items: center; }
+  nav .lk a {
+    font-size: 0.8rem; color: var(--text-muted); font-weight: 480;
+    padding: 8px 14px; border-radius: var(--radius); transition: all .25s; text-decoration: none;
+  }
+  nav .lk a:hover { color: var(--text-soft); background: rgba(255,255,255,0.04); }
+  .nav-btn {
+    background: var(--accent); color: var(--bg) !important; font-weight: 550 !important;
+    padding: 8px 20px !important; margin-left: 8px;
+  }
+  .nav-btn:hover { background: var(--accent-bright) !important; }
+  @media (max-width: 720px) { nav .lk a:not(.nav-btn) { display: none; } }
+
+  .hero {
+    min-height: 100dvh; display: flex; flex-direction: column;
+    align-items: center; justify-content: center; text-align: center;
+    padding: 140px 28px 100px; position: relative; overflow: hidden;
+  }
+  .hero::before {
+    content: ''; position: absolute; top: -20%; left: -15%; width: 130%; height: 70%;
+    background:
+      radial-gradient(ellipse 800px 400px at 50% 35%, rgba(123,196,232,0.04) 0%, transparent 70%),
+      radial-gradient(ellipse 600px 300px at 30% 50%, rgba(123,196,232,0.02) 0%, transparent 60%);
+    pointer-events: none;
+  }
+  .hero .orb {
+    position: absolute; width: 600px; height: 600px; border-radius: 50%;
+    top: -200px; right: -150px;
+    background: radial-gradient(circle, rgba(123,196,232,0.03) 0%, transparent 60%);
+    filter: blur(60px); pointer-events: none;
+  }
+  .hero .kicker {
+    display: inline-flex; align-items: center; gap: 8px;
+    font-family: var(--mono); font-size: 0.7rem; letter-spacing: 0.15em;
+    color: var(--text-muted); margin-bottom: 28px; position: relative;
+    padding: 6px 14px; border: 1px solid var(--border); border-radius: 100px;
+    background: rgba(255,255,255,0.02);
+  }
+  .hero .kicker em { font-style: normal; width: 5px; height: 5px; border-radius: 50%; background: var(--accent); }
+  .hero h1 {
+    font-size: clamp(2.6rem,6vw,4.8rem); font-weight: 650;
+    letter-spacing: -0.035em; line-height: 1.08; position: relative;
+    background: linear-gradient(180deg, var(--text) 50%, var(--text-soft));
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  }
+  .hero h1 .accent {
+    background: linear-gradient(135deg, var(--accent), var(--accent-bright));
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  }
+  .hero .sub {
+    max-width: 480px; margin-top: 20px; font-size: 0.92rem;
+    color: var(--text-muted); line-height: 1.8; position: relative;
+  }
+
+  .hero .pulse-panel {
+    display: flex; gap: 1px; margin-top: 40px;
+    border-radius: var(--radius-xl); overflow: hidden;
+    background: var(--border); position: relative;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+  }
+  .pulse-item { padding: 22px 30px; background: var(--bg-card); text-align: center; min-width: 130px; flex: 1; }
+  .pulse-item:first-child { border-radius: var(--radius-xl) 0 0 var(--radius-xl); }
+  .pulse-item:last-child { border-radius: 0 var(--radius-xl) var(--radius-xl) 0; }
+  .pulse-item .lbl {
+    font-size: 0.7rem; font-family: var(--mono); color: var(--text-dim);
+    letter-spacing: 0.08em; margin-bottom: 6px; text-transform: uppercase;
+  }
+  .pulse-item .val { font-size: 1.8rem; font-weight: 650; letter-spacing: -0.03em; }
+  .pulse-item .val.g { color: var(--accent); }
+  .pulse-item .val.a { color: var(--amber); }
+  .pulse-item .note { font-size: 0.78rem; color: var(--text-dim); margin-top: 3px; }
+
+  .hero .actions { margin-top: 44px; display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; position: relative; }
+  .btn {
+    display: inline-flex; align-items: center; gap: 8px;
+    padding: 12px 28px; border-radius: var(--radius);
+    font-size: 0.85rem; font-weight: 530; border: none; cursor: pointer;
+    font-family: inherit; transition: all .3s var(--ease);
+  }
+  .btn-p { background: var(--accent); color: var(--bg); box-shadow: 0 4px 20px rgba(123,196,232,0.15); }
+  .btn-p:hover { transform: translateY(-2px); box-shadow: 0 8px 30px rgba(123,196,232,0.25); }
+  .btn-o { background: transparent; color: var(--text-soft); border: 1px solid var(--border); }
+  .btn-o:hover { border-color: rgba(255,255,255,0.15); background: rgba(255,255,255,0.03); }
+  @media (max-width: 640px) { .hero .pulse-panel { flex-wrap: wrap; } .pulse-item { min-width: calc(50% - 0.5px); } }
+
+  section { padding: 120px 28px; position: relative; }
+  section .i { max-width: var(--w); margin: 0 auto; }
+  .sec-label {
+    display: inline-block; font-family: var(--mono); font-size: 0.65rem;
+    letter-spacing: 0.12em; color: var(--accent); margin-bottom: 10px; text-transform: uppercase;
+  }
+  .sec-title {
+    font-size: clamp(1.8rem,2.8vw,2.6rem); font-weight: 620;
+    letter-spacing: -0.025em; line-height: 1.15;
+    background: linear-gradient(180deg, var(--text) 50%, var(--text-soft));
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  }
+  .sec-desc { max-width: 520px; margin-top: 14px; font-size: 0.88rem; color: var(--text-muted); line-height: 1.8; }
+  .divider { border: none; height: 1px; background: linear-gradient(90deg, transparent, var(--border), transparent); }
+
+  .letter-wrap { display: grid; grid-template-columns: 1fr 360px; gap: 48px; margin-top: 48px; align-items: start; }
+  .letter-body {
+    padding: 44px 48px; border: 1px solid var(--border); border-radius: var(--radius-xl);
+    background: linear-gradient(180deg, rgba(255,255,255,0.02) 0%, transparent 100%); position: relative;
+  }
+  .letter-body::before {
+    content: ''; position: absolute; top: 0; left: 48px; right: 48px; height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(123,196,232,0.2), transparent);
+  }
+  .letter-body .date { font-family: var(--mono); font-size: 0.7rem; color: var(--text-dim); margin-bottom: 28px; }
+  .letter-body p { font-size: 0.92rem; color: var(--text-soft); line-height: 1.9; margin-bottom: 18px; }
+  .letter-body .greeting { font-weight: 500; color: var(--text); }
+  .letter-body .sig { margin-top: 36px; padding-top: 24px; border-top: 1px solid var(--border); }
+  .letter-body .sig .name {
+    font-size: 1rem; font-weight: 600;
+    background: linear-gradient(135deg, var(--accent), var(--accent-bright));
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  }
+  .letter-body .sig .title { font-size: 0.78rem; color: var(--text-muted); margin-top: 2px; }
+  .letter-body .sig .creed {
+    margin-top: 18px; font-style: italic; font-size: 0.85rem; color: var(--text-muted);
+    padding: 18px 22px; border-left: 2px solid var(--accent);
+    background: var(--accent-glow); border-radius: 0 var(--radius) var(--radius) 0;
+  }
+  .letter-stats {
+    border: 1px solid var(--border); border-radius: var(--radius-xl);
+    padding: 32px; background: var(--bg-card); position: sticky; top: 80px;
+  }
+  .letter-stats h4 { font-size: 0.7rem; font-family: var(--mono); color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 20px; }
+  .letter-stats .row { display: flex; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid var(--border); font-size: 0.82rem; }
+  .letter-stats .row:last-child { border-bottom: none; }
+  .letter-stats .row .l { color: var(--text-muted); }
+  .letter-stats .row .r { color: var(--text-soft); font-weight: 500; }
+  @media (max-width: 860px) { .letter-wrap { grid-template-columns: 1fr; } .letter-stats { position: static; } .letter-body { padding: 32px 28px; } }
+
+  #philosophy { padding-top: 100px; }
+  .phil-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 20px; margin-top: 48px; }
+  .phil-card {
+    border: 1px solid var(--border); border-radius: var(--radius-xl);
+    padding: 40px 36px; background: var(--bg-card); position: relative;
+    transition: all .4s var(--ease);
+  }
+  .phil-card:hover { border-color: var(--border-hover); transform: translateY(-3px); box-shadow: 0 20px 60px rgba(0,0,0,0.2); }
+  .phil-card::after {
+    content: ''; position: absolute; top: 0; left: 36px; right: 36px; height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(123,196,232,0.1), transparent);
+    opacity: 0; transition: opacity .4s;
+  }
+  .phil-card:hover::after { opacity: 1; }
+  .phil-card .num { font-family: var(--mono); font-size: 0.75rem; color: var(--accent); margin-bottom: 16px; letter-spacing: 0.06em; }
+  .phil-card h3 { font-size: 1.1rem; font-weight: 580; margin-bottom: 12px; }
+  .phil-card p { font-size: 0.85rem; color: var(--text-muted); line-height: 1.8; }
+  @media (max-width: 800px) { .phil-grid { grid-template-columns: 1fr; } }
+
+  #matrix { padding-top: 100px; }
+  .matrix-panel {
+    margin-top: 48px; border: 1px solid var(--border); border-radius: var(--radius-xl);
+    padding: 40px; background: var(--bg-card); position: relative; overflow: hidden;
+  }
+  .matrix-panel::before {
+    content: ''; position: absolute; top: 0; left: 0; right: 0; height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(123,196,232,0.15), transparent);
+  }
+  .m-grid { display: grid; grid-template-columns: repeat(5,1fr); gap: 16px; }
+  .m-card {
+    border: 1px solid var(--border); border-radius: var(--radius-l);
+    padding: 28px 20px; text-align: center; background: var(--bg);
+    transition: all .3s var(--ease);
+  }
+  .m-card:hover { border-color: var(--border-hover); transform: translateY(-2px); }
+  .m-card .lbl { font-size: 0.72rem; font-family: var(--mono); color: var(--text-dim); letter-spacing: 0.06em; margin-bottom: 10px; text-transform: uppercase; }
+  .m-card .sc { font-size: 2.4rem; font-weight: 650; letter-spacing: -0.03em; }
+  .m-card .wgt { font-size: 0.75rem; color: var(--text-dim); margin-top: 4px; }
+  .m-card .det { font-size: 0.78rem; color: var(--text-muted); margin-top: 10px; padding: 4px 10px; border-radius: 4px; background: rgba(255,255,255,0.02); display: inline-block; }
+  .m-foot { display: flex; gap: 40px; justify-content: center; flex-wrap: wrap; margin-top: 28px; padding: 20px 24px; border: 1px solid var(--border); border-radius: var(--radius-l); background: var(--bg); }
+  .m-foot .mf-item { text-align: center; }
+  .m-foot .mf-item .l { font-size: 0.7rem; font-family: var(--mono); color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 4px; }
+  .m-foot .mf-item .v { font-size: 1.1rem; font-weight: 600; }
+  @media (max-width: 768px) { .m-grid { grid-template-columns: repeat(3,1fr); } }
+  @media (max-width: 480px) { .m-grid { grid-template-columns: repeat(2,1fr); } }
+
+  #watchlist { padding-top: 100px; }
+  .watch-wrap { margin-top: 48px; border: 1px solid var(--border); border-radius: var(--radius-xl); overflow: hidden; background: var(--bg-card); }
+  .watch-table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
+  .watch-table thead { background: rgba(255,255,255,0.02); }
+  .watch-table th { padding: 14px 20px; font-family: var(--mono); font-size: 0.7rem; font-weight: 500; color: var(--text-dim); text-align: left; letter-spacing: 0.06em; text-transform: uppercase; border-bottom: 1px solid var(--border); }
+  .watch-table td { padding: 16px 20px; border-bottom: 1px solid var(--border); color: var(--text-soft); }
+  .watch-table tr:last-child td { border-bottom: none; }
+  .watch-table tr:hover td { background: rgba(255,255,255,0.02); }
+  .watch-table .name { font-weight: 550; color: var(--text); }
+  .watch-table .code { font-size: 0.7rem; color: var(--text-dim); margin-left: 6px; }
+  .watch-table .sector { font-size: 0.78rem; color: var(--text-muted); }
+  .watch-table .sc-f { font-weight: 600; }
+  .watch-table .sc-h { color: var(--accent); }
+  .watch-table .sc-m { color: var(--amber); }
+  .tag { display: inline-block; font-size: 0.7rem; padding: 2px 8px; border-radius: 4px; background: rgba(123,196,232,0.06); color: var(--accent); margin-right: 4px; font-weight: 500; }
+  .tag-a { background: rgba(240,179,64,0.08); color: var(--amber); }
+
+  #reports { padding-top: 100px; }
+  .report-list { margin-top: 48px; display: flex; flex-direction: column; gap: 8px; }
+  .report-item { display: flex; align-items: center; gap: 20px; padding: 20px 24px; border: 1px solid var(--border); border-radius: var(--radius-l); background: var(--bg-card); transition: all .3s var(--ease); cursor: pointer; }
+  .report-item:hover { border-color: var(--border-hover); background: rgba(123,196,232,0.02); transform: translateX(4px); }
+  .report-item .date { font-family: var(--mono); font-size: 0.7rem; color: var(--text-dim); min-width: 72px; flex-shrink: 0; }
+  .report-item .bd { flex: 1; min-width: 0; }
+  .report-item .bd .title { font-weight: 550; font-size: 0.9rem; }
+  .report-item .bd .desc { font-size: 0.8rem; color: var(--text-muted); margin-top: 2px; }
+  .report-empty { text-align: center; padding: 60px 24px; color: var(--text-dim); }
+  .report-empty .icon { font-size: 2.4rem; margin-bottom: 16px; display: block; }
+  .report-empty h4 { font-weight: 550; color: var(--text-muted); margin-bottom: 8px; }
+  .report-empty p { font-size: 0.82rem; }
+
+  #team { padding-top: 100px; }
+  .team-grid { display: grid; grid-template-columns: repeat(6,1fr); gap: 12px; margin-top: 48px; }
+  .tm { border: 1px solid var(--border); border-radius: var(--radius-l); padding: 24px 16px; text-align: center; background: var(--bg-card); transition: all .3s var(--ease); }
+  .tm:hover { border-color: var(--border-hover); transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,0,0,0.15); }
+  .tm .ic { font-size: 1.5rem; margin-bottom: 8px; display: block; }
+  .tm .n { font-size: 0.78rem; font-weight: 550; }
+  .tm .t { font-size: 0.75rem; color: var(--text-muted); margin-top: 3px; }
+  @media (max-width: 800px) { .team-grid { grid-template-columns: repeat(3,1fr); } }
+  @media (max-width: 480px) { .team-grid { grid-template-columns: repeat(2,1fr); } }
+
+  #message { padding-top: 100px; }
+  .msg-layout { display: grid; grid-template-columns: 1fr 1fr; gap: 48px; margin-top: 48px; align-items: start; }
+  .msg-info p { font-size: 0.85rem; color: var(--text-muted); line-height: 1.8; margin-bottom: 24px; }
+  .msg-form { display: flex; flex-direction: column; gap: 14px; }
+  .msg-form .r2 { display: flex; gap: 14px; }
+  .msg-form .r2 > * { flex: 1; }
+  .msg-form input, .msg-form textarea { width: 100%; padding: 14px 18px; border: 1px solid var(--border); border-radius: var(--radius); background: rgba(0,0,0,0.3); color: var(--text); font-family: inherit; font-size: 0.85rem; transition: all .25s; outline: none; }
+  .msg-form input:focus, .msg-form textarea:focus { border-color: rgba(123,196,232,0.3); box-shadow: 0 0 0 3px var(--accent-glow); }
+  .msg-form textarea { min-height: 130px; resize: vertical; }
+  .msg-form .btn-p { align-self: flex-start; }
+  .msg-success { display: none; margin-top: 16px; padding: 16px 20px; border: 1px solid rgba(123,196,232,0.2); border-radius: var(--radius); background: rgba(123,196,232,0.04); font-size: 0.85rem; color: var(--accent); animation: fadeUp .4s var(--ease); }
+  @keyframes fadeUp { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+  @media (max-width: 720px) { .msg-layout { grid-template-columns: 1fr; } }
+
+  footer { text-align: center; padding: 48px 28px 36px; border-top: 1px solid var(--border); }
+  footer .i { max-width: var(--w); margin: 0 auto; }
+  footer .links { display: flex; gap: 24px; justify-content: center; margin-bottom: 20px; }
+  footer .links a { font-size: 0.78rem; color: var(--text-muted); transition: color .2s; text-decoration: none; }
+  footer .links a:hover { color: var(--accent); }
+  footer .copy { font-size: 0.72rem; color: var(--text-dim); }
+
+  ::-webkit-scrollbar { width: 6px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+  ::-webkit-scrollbar-thumb:hover { background: var(--text-dim); }
+</style>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,480;14..32,500;14..32,530;14..32,550;14..32,580;14..32,600;14..32,620;14..32,650&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+</head>
+<body>
+
+<nav>
+  <div class="i">
+    <a href="#" class="logo">三疯<em>OPC</em></a>
+    <div class="lk">
+      <a href="#letter">致投资者</a>
+      <a href="#matrix">决策矩阵</a>
+      <a href="#watchlist">关注标的</a>
+      <a href="#reports">投研报告</a>
+      <a href="#message" class="nav-btn">留言</a>
+    </div>
+  </div>
+</nav>
+
+<section class="hero">
+  <div class="orb"></div>
+  <div class="kicker"><em></em> 三疯投研 · 开源 · 2026</div>
+  <h1>具身智能 · <span class="accent">机器人</span><br>物理 AI 投资研究</h1>
+  <p class="sub">AI 驱动的开源投研组织 · 12 位 AI 分析师 7×24 覆盖 · 研究驱动 · 量化验证</p>
+
+  <div class="pulse-panel">
+    <div class="pulse-item">
+      <div class="lbl">恐惧贪婪</div>
+      <div class="val g">1</div>
+      <div class="note">极度恐惧 🔵</div>
+    </div>
+    <div class="pulse-item">
+      <div class="lbl">决策指数</div>
+      <div class="val a">1.0</div>
+      <div class="note">中性观望</div>
+    </div>
+    <div class="pulse-item">
+      <div class="lbl">建议仓位</div>
+      <div class="val g">20-40%</div>
+      <div class="note">当前 49%</div>
+    </div>
+    <div class="pulse-item">
+      <div class="lbl">操作模式</div>
+      <div class="val a">opportunistic</div>
+      <div class="note">「别人恐惧我贪婪。市场在给我们送钱。」</div>
+    </div>
+  </div>
+
+  <div class="actions">
+    <a href="#letter" class="btn btn-p">致投资者信 →</a>
+    <a href="#matrix" class="btn btn-o">决策矩阵</a>
+  </div>
+</section>
+
+<hr class="divider">
+
+<section id="letter">
+  <div class="i">
+    <div class="sec-label">致投资者信</div>
+    <h2 class="sec-title">恐惧是打折，不是离场</h2>
+    <div class="letter-wrap">
+      <div class="letter-body">
+        <div class="date">2026/06/06 21:50:46 · 市场闭盘中</div>
+        <p class="greeting">亲爱的合作伙伴：</p>
+        <p>纳指单日跌-4.2%——情绪宣泄，不是结构性熊市。NVIDIA订单排到2028，AI算力需求没有一毛钱减少。恐慌=打折。 📚今日学习: 今日论文集中在「机器人通用」方向(3篇)。涉及标的: 三花智控, 优必选, 奥比中光, 绿的谐波, 舜宇光学。新术语: vla, kinematic, policy。</p>
+        <p>别人恐惧我贪婪。绿的谐波、埃斯顿这些有真实利润的龙头，正在打折。</p>
+        <p>已制定 2 笔交易计划。待收盘后执行。</p>
+        <div class="sig">
+          <div class="name">疯总</div>
+          <div class="title">三疯投研 CEO · 操盘决策</div>
+          <div class="creed">「别人恐慌时做功课，别人狂热时翻石头。」</div>
+        </div>
+      </div>
+      <div class="letter-stats">
+        <h4>当前状态</h4>
+        <div class="row"><span class="l">基金规模</span><span class="r">1000.0万</span></div>
+        <div class="row"><span class="l">持仓数量</span><span class="r">0</span></div>
+        <div class="row"><span class="l">交易计划</span><span class="r" style="color:var(--amber)">2 笔</span></div>
+        <div class="row"><span class="l">风控状态</span><span class="r" style="color:var(--accent)">绿灯</span></div>
+        <div class="row"><span class="l">信号追踪</span><span class="r">T+5 已开启</span></div>
+        <div class="row"><span class="l">CEO 情绪</span><span class="r" style="color:var(--amber)">opportunistic</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<hr class="divider">
+
+<section id="philosophy">
+  <div class="i">
+    <div class="sec-label">投资哲学</div>
+    <h2 class="sec-title">三条铁律</h2>
+    <p class="sec-desc">贯穿所有决策的底层原则，不因市场波动而改变。</p>
+    <div class="phil-grid">
+      <div class="phil-card">
+        <div class="num">01</div>
+        <h3>赛道 > 时机</h3>
+        <p>具身智能是比新能源大 10 倍的赛道。20 年产业趋势面前，短期择时噪音忽略不计。选对赛道，时间站在你这边。</p>
+      </div>
+      <div class="phil-card">
+        <div class="num">02</div>
+        <h3>恐慌 = 打折</h3>
+        <p>每一次恐慌性下跌都是优质资产的折扣季。情绪是市场的噪音，利润表才是信号。别人恐惧我贪婪，别人贪婪我谨慎。</p>
+      </div>
+      <div class="phil-card">
+        <div class="num">03</div>
+        <h3>研究驱动</h3>
+        <p>12 个 AI 分析师，5 层决策矩阵，7×24 覆盖。用系统化的投研流程替代情绪化决策。每一个买入建议都有反向论证。</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<hr class="divider">
+
+<section id="matrix">
+  <div class="i">
+    <div class="sec-label">决策矩阵</div>
+    <h2 class="sec-title">5 层加权评分</h2>
+    <p class="sec-desc">每个维度独立打分，按权重合成最终仓位建议。数据驱动，没有拍脑袋。</p>
+    <div class="matrix-panel">
+      <div class="m-grid"><div class="m-card">
+      <div class="lbl">宏观</div>
+      <div class="sc" style="color:var(--fire)">0.0</div>
+      <div class="wgt">权重 22%</div>
+      <div class="det">risk_off</div>
+    </div>
+        <div class="m-card">
+      <div class="lbl">大盘</div>
+      <div class="sc" style="color:var(--accent)">1.0</div>
+      <div class="wgt">权重 20%</div>
+      <div class="det">mixed</div>
+    </div>
+        <div class="m-card">
+      <div class="lbl">资金</div>
+      <div class="sc" style="color:var(--amber)">0.5</div>
+      <div class="wgt">权重 12%</div>
+      <div class="det">成交0亿</div>
+    </div>
+        <div class="m-card">
+      <div class="lbl">量化</div>
+      <div class="sc" style="color:var(--accent)">1.8</div>
+      <div class="wgt">权重 26%</div>
+      <div class="det">多8空5</div>
+    </div>
+        <div class="m-card">
+      <div class="lbl">基本面</div>
+      <div class="sc" style="color:var(--accent)">1.2</div>
+      <div class="wgt">权重 20%</div>
+      <div class="det">均6.0/10 强0避0</div>
+    </div>
+        </div>
+      <div class="m-foot">
+        <div class="mf-item">
+          <div class="l">加权总分</div>
+          <div class="v" style="color:var(--amber)">1.0</div>
+        </div>
+        <div class="mf-item">
+          <div class="l">操作建议</div>
+          <div class="v">中性观望</div>
+        </div>
+        <div class="mf-item">
+          <div class="l">建议仓位</div>
+          <div class="v" style="color:var(--accent)">20-40%</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<hr class="divider">
+
+<section id="watchlist">
+  <div class="i">
+    <div class="sec-label">关注标的</div>
+    <h2 class="sec-title">研究管线</h2>
+    <p class="sec-desc">当前重点覆盖标的，按量化评分 + 基本面综合排序。数据每日更新。</p>
+    <div class="watch-wrap">
+      <table class="watch-table">
+        <thead><tr><th>标的</th><th>赛道</th><th>市场</th><th>量化评分</th><th>基本面</th><th>信号</th></tr></thead>
+        <tbody><tr>
+      <td><span class="name">新时达</span><span class="code">002527.SZ</span></td>
+      <td class="sector">运动控制</td>
+      <td>A股</td>
+      <td><span class="sc-f" style="color:var(--accent)">3.5</span></td>
+      <td style="color:var(--text-muted)">5.3</td>
+      <td><span class="tag">M5↑ 短期</span><span class="tag">M60↑ 中期</span><span class="tag">M+</span></td>
+    </tr><tr>
+      <td><span class="name">UiPath</span><span class="code">PATH</span></td>
+      <td class="sector">RPA/自动化</td>
+      <td>美股</td>
+      <td><span class="sc-f" style="color:var(--accent)">3.5</span></td>
+      <td style="color:var(--text-muted)">5.9</td>
+      <td><span class="tag">M5↑ 短期</span><span class="tag">M60↑ 中期</span><span class="tag">M+</span></td>
+    </tr><tr>
+      <td><span class="name">瑞声科技</span><span class="code">02018.HK</span></td>
+      <td class="sector">精密传感器</td>
+      <td>港股</td>
+      <td><span class="sc-f" style="color:var(--accent)">3.5</span></td>
+      <td style="color:var(--text-muted)">6.2</td>
+      <td><span class="tag">M5↑ 短期</span><span class="tag">M60↑ 中期</span><span class="tag">M+</span></td>
+    </tr><tr>
+      <td><span class="name">丘钛科技</span><span class="code">01478.HK</span></td>
+      <td class="sector">视觉模组</td>
+      <td>港股</td>
+      <td><span class="sc-f" style="color:var(--accent)">3.5</span></td>
+      <td style="color:var(--text-muted)">5.3</td>
+      <td><span class="tag">M5↑ 短期</span><span class="tag">M60↑ 中期</span><span class="tag">M+</span></td>
+    </tr><tr>
+      <td><span class="name">埃斯顿</span><span class="code">002747.SZ</span></td>
+      <td class="sector">工业机器人</td>
+      <td>A股</td>
+      <td><span class="sc-f" style="color:var(--accent)">3.0</span></td>
+      <td style="color:var(--text-muted)">5.6</td>
+      <td><span class="tag">M5↑ 短期</span><span class="tag">M60↑ 中期</span><span class="tag">M+</span></td>
+    </tr></tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<hr class="divider">
+
+<section id="reports">
+  <div class="i">
+    <div class="sec-label">研究矩阵</div>
+    <h2 class="sec-title">投研报告与信号</h2>
+    <p class="sec-desc">每日跟踪、每周深度、每月回顾。所有报告按时间线排列。</p>
+    <div class="report-list">
+      <div class="report-item" style="cursor:default">
+        <div class="report-empty" style="width:100%">
+          <span class="icon">📡</span>
+          <h4>投研报告生成中</h4>
+          <p>12 位 AI 分析师正在 7×24 覆盖赛道动态<br>首份投研报告即将发布，敬请期待</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<hr class="divider">
+
+<section id="team">
+  <div class="i">
+    <div class="sec-label">研值局</div>
+    <h2 class="sec-title">12 位 AI 分析师</h2>
+    <p class="sec-desc">每位分析师专精一个维度，数据驱动、去情绪化、持续追踪。</p>
+    <div class="team-grid">
+      <div class="tm"><span class="ic">🧠</span><div class="n">CEO 疯总</div><div class="t">终极决策</div></div>
+      <div class="tm"><span class="ic">📊</span><div class="n">宏观分析师</div><div class="t">周期判断</div></div>
+      <div class="tm"><span class="ic">🔬</span><div class="n">研究员</div><div class="t">赛道深度</div></div>
+      <div class="tm"><span class="ic">📈</span><div class="n">量化分析师</div><div class="t">信号生成</div></div>
+      <div class="tm"><span class="ic">💹</span><div class="n">基本面分析师</div><div class="t">财务模型</div></div>
+      <div class="tm"><span class="ic">🛡️</span><div class="n">风控官</div><div class="t">止损监控</div></div>
+      <div class="tm"><span class="ic">🏦</span><div class="n">资金面分析师</div><div class="t">机构动向</div></div>
+      <div class="tm"><span class="ic">🎯</span><div class="n">策略师</div><div class="t">战术配置</div></div>
+      <div class="tm"><span class="ic">📋</span><div class="n">绩效官</div><div class="t">归因分析</div></div>
+      <div class="tm"><span class="ic">⚡</span><div class="n">市场分析师</div><div class="t">技术形态</div></div>
+      <div class="tm"><span class="ic">📡</span><div class="n">情报官</div><div class="t">信息聚合</div></div>
+      <div class="tm"><span class="ic">🤖</span><div class="n">行业分析师</div><div class="t">机器人赛道</div></div>
+    </div>
+  </div>
+</section>
+
+<hr class="divider">
+
+<section id="message">
+  <div class="i">
+    <div class="sec-label">联系</div>
+    <h2 class="sec-title">留言板</h2>
+    <div class="msg-layout">
+      <div class="msg-info">
+        <h3>欢迎交流</h3>
+        <p>对具身智能赛道有独到见解？想探讨某个标的？或者只是想打个招呼——每一条留言我们都会认真阅读。</p>
+      </div>
+      <div>
+        <form class="msg-form" onsubmit="event.preventDefault(); document.getElementById('s').style.display='block'; this.reset()">
+          <div class="r2"><input type="text" placeholder="称呼" required><input type="email" placeholder="邮箱（选填）"></div>
+          <textarea placeholder="说点什么……" required></textarea>
+          <button type="submit" class="btn btn-p">发送留言 →</button>
+        </form>
+        <div id="s" class="msg-success">✓ 留言已收到！我们会认真阅读每一条消息。</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="i">
+    <div class="links">
+      <a href="#letter">致投资者</a>
+      <a href="#matrix">决策矩阵</a>
+      <a href="#watchlist">关注标的</a>
+      <a href="#message">联系</a>
+    </div>
+    <div class="copy">© 2026 三疯投研 OPC</div>
+  </div>
+</footer>
+
+<script>
+let ticking = false;
+document.addEventListener('scroll', () => {
+  if (!ticking) {
+    requestAnimationFrame(() => {
+      document.querySelector('nav').classList.toggle('scrolled', window.scrollY > 20);
+      ticking = false;
+    });
+    ticking = true;
+  }
+});
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(e => {
+    if (e.isIntersecting) { e.target.style.opacity = '1'; e.target.style.transform = 'translateY(0)'; }
+  });
+}, { threshold: 0.05 });
+document.querySelectorAll('.phil-card, .m-card, .report-item, .tm').forEach(el => {
+  el.style.opacity = '0'; el.style.transform = 'translateY(20px)';
+  el.style.transition = 'opacity 0.6s cubic-bezier(0.16,1,0.3,1), transform 0.6s cubic-bezier(0.16,1,0.3,1)';
+  observer.observe(el);
+});
+</script>
+</body>
+</html>
