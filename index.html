@@ -1,0 +1,538 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>mAam — 智联未来</title>
+<style>
+  :root {
+    --sky: #7EC8E3;
+    --sky-dark: #5AABCC;
+    --sky-light: #B8E2F2;
+    --sky-pale: #E8F6FB;
+    --ink: #1a1a2e;
+    --ink-soft: #3a3a4e;
+    --ink-muted: #6b6b80;
+    --surface: #ffffff;
+    --surface-alt: #f7f9fb;
+    --border: #e2e6ed;
+    --radius: 12px;
+    --radius-sm: 6px;
+    --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+    --font-mono: 'JetBrains Mono', 'SF Mono', 'Fira Code', monospace;
+    --max-width: 1200px;
+    --transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: var(--font-sans);
+    color: var(--ink);
+    background: var(--surface);
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* ── Navigation ── */
+  nav {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 100;
+    background: rgba(255,255,255,0.85);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--border);
+  }
+
+  nav .inner {
+    max-width: var(--max-width);
+    margin: 0 auto;
+    padding: 0 24px;
+    height: 64px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  nav .logo {
+    font-size: 1.4rem;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    color: var(--ink);
+    text-decoration: none;
+  }
+
+  nav .logo span { color: var(--sky-dark); }
+
+  nav .links { display: flex; gap: 32px; align-items: center; }
+
+  nav .links a {
+    text-decoration: none;
+    color: var(--ink-muted);
+    font-size: 0.9rem;
+    font-weight: 500;
+    transition: color var(--transition);
+  }
+
+  nav .links a:hover { color: var(--sky-dark); }
+
+  .nav-cta {
+    background: var(--sky);
+    color: white !important;
+    padding: 8px 20px;
+    border-radius: var(--radius-sm);
+    font-weight: 600;
+    transition: background var(--transition) !important;
+  }
+  .nav-cta:hover { background: var(--sky-dark) !important; color: white !important; }
+
+  @media (max-width: 640px) {
+    nav .links a:not(.nav-cta) { display: none; }
+  }
+
+  /* ── Hero ── */
+  .hero {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 120px 24px 80px;
+    background: linear-gradient(180deg, var(--sky-pale) 0%, var(--surface) 60%);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .hero::before {
+    content: '';
+    position: absolute;
+    top: -40%;
+    left: -20%;
+    width: 140%;
+    height: 100%;
+    background: radial-gradient(ellipse at 50% 40%, var(--sky-light) 0%, transparent 60%);
+    opacity: 0.5;
+    pointer-events: none;
+  }
+
+  .hero h1 {
+    font-size: clamp(3rem, 8vw, 5.5rem);
+    font-weight: 800;
+    letter-spacing: -0.03em;
+    line-height: 1.1;
+    color: var(--ink);
+    position: relative;
+  }
+
+  .hero h1 .accent { color: var(--sky-dark); }
+
+  .hero p {
+    max-width: 560px;
+    margin-top: 24px;
+    font-size: 1.15rem;
+    color: var(--ink-muted);
+    line-height: 1.7;
+    position: relative;
+  }
+
+  .hero .actions {
+    margin-top: 40px;
+    display: flex;
+    gap: 16px;
+    flex-wrap: wrap;
+    justify-content: center;
+    position: relative;
+  }
+
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 14px 32px;
+    border-radius: var(--radius-sm);
+    font-size: 1rem;
+    font-weight: 600;
+    text-decoration: none;
+    transition: all var(--transition);
+    cursor: pointer;
+    border: none;
+    font-family: inherit;
+  }
+
+  .btn-primary {
+    background: var(--sky);
+    color: white;
+    box-shadow: 0 4px 14px rgba(94, 173, 204, 0.3);
+  }
+  .btn-primary:hover {
+    background: var(--sky-dark);
+    box-shadow: 0 6px 20px rgba(94, 173, 204, 0.4);
+    transform: translateY(-1px);
+  }
+
+  .btn-outline {
+    background: transparent;
+    color: var(--ink);
+    border: 1.5px solid var(--border);
+  }
+  .btn-outline:hover {
+    border-color: var(--sky);
+    color: var(--sky-dark);
+  }
+
+  /* ── Sections ── */
+  section { padding: 96px 24px; }
+
+  section .inner {
+    max-width: var(--max-width);
+    margin: 0 auto;
+  }
+
+  .section-label {
+    font-size: 0.8rem;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--sky-dark);
+    margin-bottom: 12px;
+  }
+
+  .section-title {
+    font-size: clamp(2rem, 4vw, 2.8rem);
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    line-height: 1.2;
+    color: var(--ink);
+  }
+
+  .section-desc {
+    max-width: 600px;
+    margin-top: 16px;
+    font-size: 1.05rem;
+    color: var(--ink-muted);
+    line-height: 1.7;
+  }
+
+  /* ── About ── */
+  #about {
+    background: var(--surface-alt);
+  }
+
+  .about-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 64px;
+    margin-top: 48px;
+    align-items: center;
+  }
+
+  .about-grid .text p {
+    color: var(--ink-soft);
+    line-height: 1.8;
+    margin-bottom: 20px;
+    font-size: 1.05rem;
+  }
+
+  .about-grid .visual {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+  }
+
+  .stat-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 28px 24px;
+    text-align: center;
+  }
+
+  .stat-card .num {
+    font-size: 2.2rem;
+    font-weight: 800;
+    color: var(--sky-dark);
+    line-height: 1;
+  }
+
+  .stat-card .label {
+    margin-top: 8px;
+    font-size: 0.85rem;
+    color: var(--ink-muted);
+  }
+
+  @media (max-width: 768px) {
+    .about-grid { grid-template-columns: 1fr; gap: 40px; }
+  }
+
+  /* ── Services ── */
+  .services-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 24px;
+    margin-top: 48px;
+  }
+
+  .service-card {
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 40px 32px;
+    transition: all var(--transition);
+    background: var(--surface);
+  }
+
+  .service-card:hover {
+    border-color: var(--sky-light);
+    box-shadow: 0 8px 30px rgba(94, 173, 204, 0.08);
+    transform: translateY(-2px);
+  }
+
+  .service-card .icon {
+    width: 48px;
+    height: 48px;
+    border-radius: var(--radius-sm);
+    background: var(--sky-pale);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.4rem;
+    margin-bottom: 20px;
+  }
+
+  .service-card h3 {
+    font-size: 1.2rem;
+    font-weight: 600;
+    margin-bottom: 12px;
+  }
+
+  .service-card p {
+    font-size: 0.92rem;
+    color: var(--ink-muted);
+    line-height: 1.7;
+  }
+
+  @media (max-width: 900px) {
+    .services-grid { grid-template-columns: 1fr 1fr; }
+  }
+  @media (max-width: 560px) {
+    .services-grid { grid-template-columns: 1fr; }
+  }
+
+  /* ── Contact ── */
+  #contact {
+    background: var(--ink);
+    color: white;
+  }
+
+  #contact .section-label { color: var(--sky-light); }
+  #contact .section-title { color: white; }
+  #contact .section-desc { color: rgba(255,255,255,0.65); }
+
+  .contact-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 48px;
+    margin-top: 48px;
+  }
+
+  .contact-info p {
+    color: rgba(255,255,255,0.7);
+    line-height: 1.8;
+    margin-bottom: 24px;
+  }
+
+  .contact-info .item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 16px;
+    color: rgba(255,255,255,0.8);
+    font-size: 0.95rem;
+  }
+
+  .contact-info .item .ico {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.08);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.1rem;
+    flex-shrink: 0;
+  }
+
+  .contact-form input,
+  .contact-form textarea {
+    width: 100%;
+    padding: 14px 16px;
+    border: 1px solid rgba(255,255,255,0.15);
+    border-radius: var(--radius-sm);
+    background: rgba(255,255,255,0.06);
+    color: white;
+    font-family: inherit;
+    font-size: 0.95rem;
+    transition: border-color var(--transition);
+    margin-bottom: 16px;
+  }
+
+  .contact-form input::placeholder,
+  .contact-form textarea::placeholder { color: rgba(255,255,255,0.35); }
+
+  .contact-form input:focus,
+  .contact-form textarea:focus {
+    outline: none;
+    border-color: var(--sky);
+  }
+
+  .contact-form textarea {
+    min-height: 120px;
+    resize: vertical;
+  }
+
+  .contact-form .btn-primary { width: 100%; justify-content: center; }
+
+  @media (max-width: 768px) {
+    .contact-grid { grid-template-columns: 1fr; }
+  }
+
+  /* ── Footer ── */
+  footer {
+    text-align: center;
+    padding: 32px 24px;
+    border-top: 1px solid var(--border);
+    font-size: 0.85rem;
+    color: var(--ink-muted);
+  }
+
+  footer .inner {
+    max-width: var(--max-width);
+    margin: 0 auto;
+  }
+
+  footer a { color: var(--sky-dark); text-decoration: none; }
+  footer a:hover { text-decoration: underline; }
+</style>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body>
+
+<nav>
+  <div class="inner">
+    <a href="#" class="logo">m<span>Aam</span></a>
+    <div class="links">
+      <a href="#about">关于</a>
+      <a href="#services">服务</a>
+      <a href="#contact" class="nav-cta">联系我们</a>
+    </div>
+  </div>
+</nav>
+
+<section class="hero">
+  <h1>智联<span class="accent">未来</span></h1>
+  <p>mAam 致力于用人工智能技术赋能企业与个人，打造更智能、更高效的数字化解决方案。</p>
+  <div class="actions">
+    <a href="#contact" class="btn btn-primary">联系我们 →</a>
+    <a href="#about" class="btn btn-outline">了解更多</a>
+  </div>
+</section>
+
+<section id="about">
+  <div class="inner">
+    <div class="section-label">关于 mAam</div>
+    <div class="about-grid">
+      <div class="text">
+        <h2 class="section-title">AI 驱动的创新力量</h2>
+        <p>mAam 是一支专注于人工智能应用落地的团队。我们从实际业务出发，将前沿的 AI 技术与行业需求深度融合，帮助客户实现数字化转型与效率提升。</p>
+        <p>无论是智能客服、内容生成、数据分析，还是定制化 AI 解决方案，我们都能提供专业、可靠的服务。我们相信，AI 的价值在于落地，而非概念。</p>
+      </div>
+      <div class="visual">
+        <div class="stat-card">
+          <div class="num">50+</div>
+          <div class="label">服务客户</div>
+        </div>
+        <div class="stat-card">
+          <div class="num">98%</div>
+          <div class="label">客户满意度</div>
+        </div>
+        <div class="stat-card">
+          <div class="num">24/7</div>
+          <div class="label">技术支持</div>
+        </div>
+        <div class="stat-card">
+          <div class="num">∞</div>
+          <div class="label">创新不止</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="services">
+  <div class="inner">
+    <div class="section-label">服务</div>
+    <h2 class="section-title">我们提供什么</h2>
+    <p class="section-desc">从咨询到落地，覆盖 AI 应用的完整链路。</p>
+    <div class="services-grid">
+      <div class="service-card">
+        <div class="icon">🤖</div>
+        <h3>AI 智能体</h3>
+        <p>为企业定制专属 AI 助手，实现自动化业务流程、智能问答与决策支持。</p>
+      </div>
+      <div class="service-card">
+        <div class="icon">📊</div>
+        <h3>数据分析</h3>
+        <p>利用大语言模型与机器学习技术，从海量数据中提取洞察，驱动业务增长。</p>
+      </div>
+      <div class="service-card">
+        <div class="icon">🔧</div>
+        <h3>定制开发</h3>
+        <p>根据客户需求，提供端到端的 AI 应用开发服务，快速交付可靠产品。</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="contact">
+  <div class="inner">
+    <div class="section-label">联系我们</div>
+    <h2 class="section-title">开始合作</h2>
+    <p class="section-desc">无论您有具体的项目需求，还是想探讨 AI 的可能性，我们都很乐意与您交流。</p>
+    <div class="contact-grid">
+      <div class="contact-info">
+        <p>留下您的信息，我们会在 24 小时内与您取得联系。</p>
+        <div class="item">
+          <div class="ico">✉</div>
+          <span>contact@xwan.ai</span>
+        </div>
+        <div class="item">
+          <div class="ico">📱</div>
+          <span>服务时间：周一至周五 9:00-18:00</span>
+        </div>
+      </div>
+      <form class="contact-form" onsubmit="event.preventDefault(); alert('感谢您的留言！我们会尽快与您联系。')">
+        <input type="text" placeholder="您的姓名" required>
+        <input type="email" placeholder="邮箱地址" required>
+        <input type="text" placeholder="公司名称">
+        <textarea placeholder="简要描述您的需求"></textarea>
+        <button type="submit" class="btn btn-primary">提交留言</button>
+      </form>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="inner">
+    <p>© 2026 mAam. All rights reserved. | <a href="mailto:contact@xwan.ai">contact@xwan.ai</a></p>
+  </div>
+</footer>
+
+</body>
+</html>
